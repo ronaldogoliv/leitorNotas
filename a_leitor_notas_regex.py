@@ -1816,7 +1816,7 @@ def get_ticker(desc):
     return ticker.upper()
 
 
-def set_row(corretora, numero_nota, data_pregao, lado, mercado, ativo, quantidade, preco, total, taxa = '0'):
+def set_row(corretora, numero_nota, data_pregao, lado, mercado, ativo, quantidade, preco, total, taxa = '0', prazo = ""):
     taxa = str(taxa)
     corretora = corretora.strip()
     numero_nota = numero_nota.strip()
@@ -1836,7 +1836,7 @@ def set_row(corretora, numero_nota, data_pregao, lado, mercado, ativo, quantidad
     else:
         quantidade = -quantidade
 
-    ws.append([corretora, numero_nota, data_pregao, lado, mercado, ativo, quantidade, preco, total, taxa])
+    ws.append([corretora, numero_nota, data_pregao, lado, mercado, ativo, quantidade, preco, total, taxa, prazo])
     
 
 def set_exercicio(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo):
@@ -1866,11 +1866,11 @@ def set_exercicio(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, q
     set_row(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, '0', '0')
     
     
-def set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo, taxa = 0):
+def set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo, taxa = 0, prazo = ""):
     if mercado == 'Exercício de opções':
         set_exercicio(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo)
     else:
-        set_row(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, taxa)  
+        set_row(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, taxa, prazo)  
 
 
 def ler_xp(txt):
@@ -1963,9 +1963,14 @@ def ler_xp_bovespa(txt, data_pregao, numero_nota):
             quantidade = valores[nPos-3]
             preco = valores[nPos-2]
             total = valores[nPos-1]
+            prazo = re.findall(r"\d{2}\/\d{2}|\d{2}\/\d{4}|\d{2}\/\d{2}\/\d{2}|\d{2}\/\d{2}\/\d{4}", operacao)
+            if prazo: 
+                prazo = prazo[0]
+            else:
+                prazo = ""
 
             
-            set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo, taxa)
+            set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo, taxa, prazo)
 
 
 def ler_modal(txt):
@@ -2026,8 +2031,14 @@ def ler_modal_bovespa(txt, data_pregao, numero_nota):
             quantidade = valores[nPos-3]
             preco = valores[nPos-2]
             total = valores[nPos-1]
+            taxa = '0'
+            prazo = re.findall(r"\d{2}\/\d{2}|\d{2}\/\d{4}|\d{2}\/\d{2}\/\d{2}|\d{2}\/\d{2}\/\d{4}", operacao)
+            if prazo: 
+                prazo = prazo[0]
+            else:
+                prazo = ""
 
-            set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo)
+            set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo, taxa, prazo)
 
 
 def ler_nu(txt):
@@ -2086,8 +2097,14 @@ def ler_nu_bovespa(txt, data_pregao, numero_nota):
             quantidade = valores[nPos-3]
             preco = valores[nPos-2]
             total = valores[nPos-1]
+            taxa = '0'
+            prazo = re.findall(r"\d{2}\/\d{2}|\d{2}\/\d{4}|\d{2}\/\d{2}\/\d{2}|\d{2}\/\d{2}\/\d{4}", operacao)
+            if prazo: 
+                prazo = prazo[0]
+            else:
+                prazo = ""
 
-            set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo)
+            set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo, taxa, prazo)
 
 
 def ler_genial(txt):
@@ -2152,8 +2169,14 @@ def ler_genial_bovespa(txt, data_pregao, numero_nota):
                 quantidade = valores[nPos-3]
                 preco = valores[nPos-2]
                 total = valores[nPos-1]
+                taxa = '0'
+                prazo = re.findall(r"\d{2}\/\d{2}|\d{2}\/\d{4}|\d{2}\/\d{2}\/\d{2}|\d{2}\/\d{2}\/\d{4}", operacao)
+                if prazo: 
+                    prazo = prazo[0]
+                else:
+                    prazo = ""
 
-                set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo)
+                set_lancamento(corretora, numero_nota, data_pregao, lado, mercado, cod_neg, quantidade, preco, total, especificacao_titulo, taxa, prazo)
     else:
         ler_xp_bmf(txt)
 
@@ -2220,7 +2243,7 @@ def ler_itau(txt):
 
 wb = Workbook()
 ws = wb.active
-ws.append(['Corretora', 'Nº Nota', 'Data', 'Compra/Venda', 'Mercado', 'Ativo', 'Quantidade', 'Preço', 'Total', 'Taxa'])
+ws.append(['Corretora', 'Nº Nota', 'Data', 'Compra/Venda', 'Mercado', 'Ativo', 'Quantidade', 'Preço', 'Total', 'Taxa','Prazo'])
 
 dt_inicio = None
 dt_fim = None
